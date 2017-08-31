@@ -1,0 +1,23 @@
+{
+  "name": "react-flatten-treeview",
+  "version": "0.1.0",
+  "description": "React tree view rendered in a flatten structure.",
+  "main": "entry.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/avarichv/react-flatten-treeview.git"
+  },
+  "keywords": [
+    "react",
+    "treeview"
+  ],
+  "author": "Clayton Ma",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/avarichv/react-flatten-treeview/issues"
+  },
+  "homepage": "https://github.com/avarichv/react-flatten-treeview#readme"
+}
