@@ -4,7 +4,9 @@
   "description": "React tree view rendered in a flatten structure.",
   "main": "entry.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "webpack --config webpack.config.js",
+    "start": "start webpack --watch | start webpack-dev-server --open"
   },
   "repository": {
     "type": "git",
@@ -19,5 +21,22 @@
   "bugs": {
     "url": "https://github.com/avarichv/react-flatten-treeview/issues"
   },
-  "homepage": "https://github.com/avarichv/react-flatten-treeview#readme"
+  "homepage": "https://github.com/avarichv/react-flatten-treeview#readme",
+  "dependencies": {
+    "react": "^15.6.1",
+    "react-dom": "^15.6.1"
+  },
+  "devDependencies": {
+    "babel-core": "^6.26.0",
+    "babel-loader": "^7.1.2",
+    "babel-plugin-transform-class-properties": "^6.24.1",
+    "babel-plugin-transform-decorators": "^6.24.1",
+    "babel-plugin-transform-react-constant-elements": "^6.23.0",
+    "babel-plugin-transform-react-inline-elements": "^6.22.0",
+    "babel-preset-env": "^1.6.0",
+    "babel-preset-react": "^6.24.1",
+    "babel-preset-stage-0": "^6.24.1",
+    "webpack": "^3.6.0",
+    "webpack-dev-server": "^2.8.2"
+  }
 }
