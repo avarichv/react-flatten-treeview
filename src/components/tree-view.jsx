@@ -1,12 +1,19 @@
 import React, { Component } from 'react';
 
-export default class ReactFlattenTreeview extends Component {
+import Core from './tree-core.jsx';
+
+export default class FlattenTreeview extends Component {
     constructor(props) {
         super(props);
         
     }
 
     render() {
-        return <h1>f-tree!</h1>;
+        const { data, config } = this.props;
+
+        return (
+            <Core data={data} 
+                  config={config} />
+        );
     }
 }

@@ -4,14 +4,20 @@ import ReactDOM from 'react-dom';
 //import Tree from 'react-flatten-treeview';
 import Tree from './components/tree-view.jsx';
 
+import config from './demo/config.js';
+import mockup from './demo/data.js';
+
+const data = mockup.buildTree();
+
 ReactDOM.render(
-    <Tree />,
+    <Tree data={data}
+          config={config.base} />,
     document.getElementById('root')
 );
 
 /*
     data={data}
-    config={config} 
+    config={config}
     shader={shader}
     onSelect={onSelect}
     onChange={onChange}
