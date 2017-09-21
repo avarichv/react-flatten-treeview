@@ -3,6 +3,7 @@ import ReactDOM from 'react-dom';
 
 //import Tree from 'react-flatten-treeview';
 import Tree from './components/tree-view.jsx';
+import './theme/default.scss';
 
 import config from './demo/config.js';
 import mockup from './demo/data.js';

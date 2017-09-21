@@ -1,0 +1,33 @@
+body {
+    margin: 0;
+}
+
+#root {
+    background-color: lightyellow;
+    margin: 1em;
+    border: double 3px #000;
+    height: 600px;
+    width: 35%;
+    overflow: auto;
+}
+
+.f-tree {
+    &_render-panel {
+        margin: 0;
+        padding: 0;
+        list-style: none;
+    }
+
+    &_node {
+        background-color: yellow;
+
+        &:nth-child(even) {
+            background-color: orange;
+        }
+    }
+
+    &_node-shader {
+        margin: 0;
+        padding: 0 1em;
+    }
+}
