@@ -18,16 +18,27 @@ body {
         list-style: none;
     }
 
-    &_node {
+    /* &_node {
         background-color: yellow;
 
         &:nth-child(even) {
             background-color: orange;
         }
-    }
+    } */
 
     &_node-shader {
         margin: 0;
-        padding: 0 1em;
+        line-height: 28px;
+        font-family: arial;
+    }
+
+    &_toggle, &_icon {
+        display: inline-block;
+        width: 1.2em;
+        text-align: center;
+    }
+
+    &_label {
+        padding: 0 .5em;
     }
 }

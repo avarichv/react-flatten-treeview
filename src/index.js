@@ -3,12 +3,13 @@ import ReactDOM from 'react-dom';
 
 //import Tree from 'react-flatten-treeview';
 import Tree from './components/tree-view.jsx';
-import './theme/default.scss';
-
 import config from './demo/config.js';
 import mockup from './demo/data.js';
 
-const data = mockup.buildTree();
+import './theme/icons/IcoMoon-Free.css';
+import './theme/default.scss';
+
+const data = mockup.buildTree(/*null, [10,10,10]*/);
 
 ReactDOM.render(
     <Tree data={data}

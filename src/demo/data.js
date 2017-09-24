@@ -1,20 +1,26 @@
 class DemoData {
+    buildNode() {
+        return {
+            text: 'Item', 
+            children: [],  
+            isExpanded: true,
+            $level: 0
+        }
+    }
+
     buildTree(parent, pattern = [3,3,3]) {
         if(!pattern.length) { return; }
-
-        parent = parent || { text: 'item', children: [], $level: 0 };
+        parent = parent || this.buildNode();
 
         for(let i = 1; i <= pattern[0]; i++) {
-            parent.children.push({
-                text: parent.text + '.' + i,
-                children: [],
-                $level: 0
-            });
+            let node = this.buildNode();
+            node.text = parent.text + '.' + i,
+            parent.children.push(node);
         }
 
         parent.children.map(child => this.buildTree(child, pattern.slice(1)));
 
-        if(parent.text == 'item') {
+        if(parent.text == 'Item') {
             parent.text = 'root';
         }
 
