@@ -1,7 +1,8 @@
 const config = {
     base: {
         lineHieght: 28,
-        indent: 18
+        indent: 18,
+        bufferSize: 50
     }
 }
 

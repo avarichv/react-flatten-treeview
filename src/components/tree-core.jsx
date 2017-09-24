@@ -9,6 +9,7 @@ export default class FlattenTreeviewCore extends Component {
         this.state = { visible: [] };
 
         this.onClick = this.onClick.bind(this);
+        this.onScroll = this.onScroll.bind(this);
     }
 
     componentDidMount() {
@@ -71,31 +72,30 @@ export default class FlattenTreeviewCore extends Component {
         this.setState({ visible });
     }
 
+    onScroll(evt) {
+        const offset = Math.floor(evt.target.scrollTop / this.props.config.lineHieght);
+        this.setState({ offset });
+
+        //TODO: Add event cool down timer;
+    }
+
     render() {
-        let { shader, config: { lineHieght, indent } } = this.props;
-        let { visible } = this.state;
-
-        shader = shader || DefaultShader;
+        const { shader, config: { lineHieght, indent, bufferSize } } = this.props;
+        const { visible, offset } = this.state;
+        const node = shader || DefaultShader;
+        const slice = visible.slice(offset, offset + bufferSize);
+        console.error(offset, slice);
         return (
-            <div className="f-tree_core">
-                <div className="f-tree_scroll-panel"></div>
-                <ul className="f-tree_render-panel">
-                    { visible.map((item,index) => {
-                        const style = {
-                            'paddingLeft': indent * item.$level + 'px',
-                            'height': lineHieght + 'px'
-                        }
-
-                        return (
-                            <li className="f-tree_node" 
-                                data-index={index}
-                                key={item.text} 
-                                style={style}
+            <div className="f-tree_core" onScroll={this.onScroll}>
+                <div className="f-tree_scroll-panel" style={{ 'height': lineHieght * visible.length + 'px' }}></div>
+                <ul className="f-tree_render-panel" style={{ 'top': lineHieght * offset + 'px' }}>
+                    { slice.map((item,index) => (
+                            <li className="f-tree_node" data-index={index} key={item.text} 
+                                style={{ 'paddingLeft': indent * item.$level + 'px', 'height': lineHieght + 'px' }}
                                 onClick={this.onClick}>
-                                { shader(item) }
+                                { node(item) }
                             </li>
-                        );
-                    })}
+                    ))}
                 </ul>
             </div>
             

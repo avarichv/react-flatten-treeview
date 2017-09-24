@@ -8,14 +8,27 @@ body {
     border: double 3px #000;
     height: 600px;
     width: 35%;
-    overflow: auto;
 }
 
 .f-tree {
+    height: 100%;
+
+    &_core {
+        height: 100%;
+        position: relative;
+        overflow: auto;
+    }
+
+    &_scroll-panel {
+        background-color: pink;
+    }
+
     &_render-panel {
         margin: 0;
         padding: 0;
         list-style: none;
+        position: absolute;
+        top: 0;
     }
 
     /* &_node {

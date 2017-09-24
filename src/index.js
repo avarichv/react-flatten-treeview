@@ -9,7 +9,7 @@ import mockup from './demo/data.js';
 import './theme/icons/IcoMoon-Free.css';
 import './theme/default.scss';
 
-const data = mockup.buildTree(/*null, [10,10,10]*/);
+const data = mockup.buildTree(null, [100,100 ]);
 
 ReactDOM.render(
     <Tree data={data}
