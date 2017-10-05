@@ -22,7 +22,9 @@ export default class FlattenTreeviewCore extends Component {
     flatten(tree) {
         let list = [tree];
         
-        if(tree.isExpanded) {
+        tree.$level = tree.$level || 0;
+
+        if(tree.children && tree.isExpanded) {
             tree.children.map(child => {
                 child.$level = tree.$level + 1;
                 list = list.concat(this.flatten(child));
@@ -51,16 +53,16 @@ export default class FlattenTreeviewCore extends Component {
     spliceChildren(nodeList, targetIndex) {
         if(nodeList.length <= targetIndex) { return nodeList; }
 
-        const head = nodeList.slice(0, targetIndex);
-        const expansion = this.flatten(nodeList[targetIndex]);
-        const tail = nodeList.slice(targetIndex + 1, nodeList.length);
-        return head.concat(expansion).concat(tail);
+        return nodeList
+                .slice(0, targetIndex)
+                .concat(this.flatten(nodeList[targetIndex]))
+                .concat(nodeList.slice(targetIndex + 1, nodeList.length));
     }
 
     onClick(evt) {
-        const nodeIndex = parseInt(evt.currentTarget.dataset['index']) + this.state.offset;
+        const nodeIndex = parseInt(evt.currentTarget.dataset['index']);
         const node = this.state.visible[nodeIndex];
-        let visible = null;
+        let visible = null; 
 
         if(node.isExpanded) {
             node.isExpanded = false;
@@ -73,32 +75,43 @@ export default class FlattenTreeviewCore extends Component {
     }
 
     onScroll(evt) {
-        const offset = Math.floor(evt.target.scrollTop / this.props.config.lineHieght);
+        const { config: { lineHeight }} = this.props;
+        const offset = Math.floor(evt.target.scrollTop / lineHeight);
+
         this.setState({ offset });
 
         //TODO: Add event cool down timer;
     }
 
+    scrollStyle = (lineHeight, totalLines) => ({'height': lineHeight * totalLines + 'px'});
+
+    offsetStyle = (lineHeight, offset) => ({ 'top': lineHeight * offset + 'px' });
+
+    indentStyle = (lineHeight, indent, level) => ({ 'height': lineHeight + 'px', 'paddingLeft': indent * level + 'px' });
+
     render() {
-        const { shader, config: { lineHieght, indent, bufferSize } } = this.props;
+        const { shader, config: { lineHeight, indent, bufferSize } } = this.props;
         const { visible, offset } = this.state;
         const node = shader || DefaultShader;
         const slice = visible.slice(offset, offset + bufferSize);
+
         console.error(offset, slice);
+
         return (
             <div className="f-tree_core" onScroll={this.onScroll}>
-                <div className="f-tree_scroll-panel" style={{ 'height': lineHieght * visible.length + 'px' }}></div>
-                <ul className="f-tree_render-panel" style={{ 'top': lineHieght * offset + 'px' }}>
+                <div className="f-tree_scroll-panel" style={this.scrollStyle(lineHeight, visible.length)} />
+                <ul className="f-tree_render-panel" style={this.offsetStyle(lineHeight, offset)}>
                     { slice.map((item,index) => (
-                            <li className="f-tree_node" data-index={index} key={item.text} 
-                                style={{ 'paddingLeft': indent * item.$level + 'px', 'height': lineHieght + 'px' }}
-                                onClick={this.onClick}>
-                                { node(item) }
-                            </li>
+                        <li className="f-tree_node"
+                            style={this.indentStyle(lineHeight, indent, item.$level)}
+                            key={item.text}
+                            data-index={offset + index}
+                            onClick={this.onClick}>
+                            { node(item) }
+                        </li>
                     ))}
                 </ul>
-            </div>
-            
+            </div> 
         );
     }
 }

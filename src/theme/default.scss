@@ -51,6 +51,17 @@ body {
         text-align: center;
     }
 
+    &_toggle {
+        transform: scale(0.7);
+        transition: transform 0.2s ease;
+
+        &.icon-play3 {
+            &.-expanded {
+                transform: scale(0.7) rotate(90deg);
+            }
+        }
+    }
+
     &_label {
         padding: 0 .5em;
     }

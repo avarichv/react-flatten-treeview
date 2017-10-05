@@ -37,6 +37,7 @@
     "babel-preset-react": "^6.24.1",
     "babel-preset-stage-0": "^6.24.1",
     "css-loader": "^0.28.7",
+    "fetch-mock": "^5.12.2",
     "file-loader": "^0.11.2",
     "node-sass": "^4.5.3",
     "sass-loader": "^6.0.6",
