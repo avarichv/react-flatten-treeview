@@ -6,7 +6,12 @@ export default class FlattenTreeviewCore extends Component {
     constructor(props) {
         super(props);
 
-        this.state = { visible: [] };
+        this.scrollTop = 0;
+        this.cooldownTimer = null;
+        this.state = { visible: [], offset: 0 };
+
+        this.offset = this.offset.bind(this);
+        this.toggleNode = this.toggleNode.bind(this);
 
         this.onClick = this.onClick.bind(this);
         this.onScroll = this.onScroll.bind(this);
@@ -59,28 +64,45 @@ export default class FlattenTreeviewCore extends Component {
                 .concat(nodeList.slice(targetIndex + 1, nodeList.length));
     }
 
-    onClick(evt) {
-        const nodeIndex = parseInt(evt.currentTarget.dataset['index']);
-        const node = this.state.visible[nodeIndex];
+    toggleNode(node, index) {
         let visible = null; 
 
         if(node.isExpanded) {
             node.isExpanded = false;
-            visible = this.clipChildren(this.state.visible, nodeIndex);
+            visible = this.clipChildren(this.state.visible, index);
         } else {
             node.isExpanded = true;
-            visible = this.spliceChildren(this.state.visible, nodeIndex);
+            visible = this.spliceChildren(this.state.visible, index);
         }
         this.setState({ visible });
     }
 
-    onScroll(evt) {
+    offset(scrollTop) {
         const { config: { lineHeight }} = this.props;
-        const offset = Math.floor(evt.target.scrollTop / lineHeight);
+        const offset = Math.floor(scrollTop / lineHeight);
 
         this.setState({ offset });
 
-        //TODO: Add event cool down timer;
+        if(scrollTop !== this.scrollTop) {
+            this.cooldownTimer = setTimeout((me) => me.offset(me.scrollTop), 200, this);
+        } else {
+            this.cooldownTimer = null;
+        }
+    }
+
+    onClick(evt) {
+        const nodeIndex = parseInt(evt.currentTarget.dataset['index']);
+        const node = this.state.visible[nodeIndex];
+
+        this.toggleNode(node, nodeIndex);
+    }
+
+    onScroll(evt) {
+        if(!this.cooldownTimer) {
+            this.offset(evt.target.scrollTop);
+        }
+
+        this.scrollTop = evt.target.scrollTop;
     }
 
     scrollStyle = (lineHeight, totalLines) => ({'height': lineHeight * totalLines + 'px'});
@@ -95,7 +117,7 @@ export default class FlattenTreeviewCore extends Component {
         const node = shader || DefaultShader;
         const slice = visible.slice(offset, offset + bufferSize);
 
-        console.error(offset, slice);
+        //console.error(offset, slice.length);
 
         return (
             <div className="f-tree_core" onScroll={this.onScroll}>

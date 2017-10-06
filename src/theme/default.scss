@@ -20,10 +20,11 @@ body {
     }
 
     &_scroll-panel {
-        background-color: pink;
+        background-color: silver;
     }
 
     &_render-panel {
+        width: 100%;
         margin: 0;
         padding: 0;
         list-style: none;
@@ -31,13 +32,15 @@ body {
         top: 0;
     }
 
-    /* &_node {
-        background-color: yellow;
-
-        &:nth-child(even) {
-            background-color: orange;
+    &_node {
+        &:hover {
+            background-color: #d1d0ce;
         }
-    } */
+
+        /* &:nth-child(even) {
+            background-color: orange;
+        } */
+    }
 
     &_node-shader {
         margin: 0;
