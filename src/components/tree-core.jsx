@@ -1,6 +1,8 @@
 import React, { Component } from 'react';
 
 import DefaultShader from './tree-shader.jsx';
+import StateKeyFrame from './state-key-frame.jsx';
+import Trans from './transition-panel.jsx';
 
 export default class FlattenTreeviewCore extends Component {
     constructor(props) {
@@ -9,13 +11,16 @@ export default class FlattenTreeviewCore extends Component {
         this.scrollTop = 0;
         this.cooldownTimer = null;
         this.state = { visible: [], offset: 0 };
+        this.keyFrames = new StateKeyFrame(this);
 
-        this.offset = this.offset.bind(this);
+        this.offsetByTop = this.offsetByTop.bind(this);
         this.toggleNode = this.toggleNode.bind(this);
 
         this.onClick = this.onClick.bind(this);
         this.onScroll = this.onScroll.bind(this);
     }
+
+    /* React ife cycle methods */
 
     componentDidMount() {
         this.setState({ 
@@ -24,12 +29,14 @@ export default class FlattenTreeviewCore extends Component {
         });
     }
 
-    flatten(tree) {
+    /* Private methods */
+
+    flatten(tree, enforceExpand) {
         let list = [tree];
         
         tree.$level = tree.$level || 0;
 
-        if(tree.children && tree.isExpanded) {
+        if(tree.children && tree.isExpanded || enforceExpand) {
             tree.children.map(child => {
                 child.$level = tree.$level + 1;
                 list = list.concat(this.flatten(child));
@@ -37,6 +44,10 @@ export default class FlattenTreeviewCore extends Component {
         }
 
         return list;
+    }
+
+    flattenChildren(node) {
+        return this.flatten(node, true).slice(1);
     }
 
     clipChildren(nodeList, targetIndex) {
@@ -65,30 +76,40 @@ export default class FlattenTreeviewCore extends Component {
     }
 
     toggleNode(node, index) {
-        let visible = null; 
+        node.isExpanded = !node.isExpanded;
+        let children = this.flattenChildren(node);
+        let visible = this.state.visible;
 
-        if(node.isExpanded) {
-            node.isExpanded = false;
-            visible = this.clipChildren(this.state.visible, index);
+        if(!node.isExpanded) {
+            visible = this.clipChildren(visible, index);
+            this.keyFrames
+                .set(keyFrames => keyFrames.play({ visible, transition: { index, children }}))
+                .set(keyFrames => setTimeout(me => me.play({ transition: { index, children, collapse: true }}), 10, keyFrames))
+                .set(keyFrames => setTimeout(me => me.play({ transition: null }), 200, keyFrames))
+                .play();
         } else {
-            node.isExpanded = true;
-            visible = this.spliceChildren(this.state.visible, index);
+            visible = this.spliceChildren(visible, index);
+            this.keyFrames
+                .set(keyFrames => keyFrames.play({ transition: { index, children, isBusy: false, expand: true }}))
+                .set(keyFrames => setTimeout(me => me.play({ visible, transition: null }), 200, keyFrames))
+                .play();
         }
-        this.setState({ visible });
     }
 
-    offset(scrollTop) {
+    offsetByTop(scrollTop) {
         const { config: { lineHeight }} = this.props;
         const offset = Math.floor(scrollTop / lineHeight);
 
         this.setState({ offset });
 
         if(scrollTop !== this.scrollTop) {
-            this.cooldownTimer = setTimeout((me) => me.offset(me.scrollTop), 200, this);
+            this.cooldownTimer = setTimeout(me => me.offsetByTop(me.scrollTop), 200, this);
         } else {
             this.cooldownTimer = null;
         }
     }
+
+    /* Event handlers */
 
     onClick(evt) {
         const nodeIndex = parseInt(evt.currentTarget.dataset['index']);
@@ -99,37 +120,56 @@ export default class FlattenTreeviewCore extends Component {
 
     onScroll(evt) {
         if(!this.cooldownTimer) {
-            this.offset(evt.target.scrollTop);
+            this.offsetByTop(evt.target.scrollTop);
         }
 
         this.scrollTop = evt.target.scrollTop;
     }
 
+    /*Render section*/
+
     scrollStyle = (lineHeight, totalLines) => ({'height': lineHeight * totalLines + 'px'});
 
     offsetStyle = (lineHeight, offset) => ({ 'top': lineHeight * offset + 'px' });
 
-    indentStyle = (lineHeight, indent, level) => ({ 'height': lineHeight + 'px', 'paddingLeft': indent * level + 'px' });
+    nodeStyle = (lineHeight, indent, level, index, transition) => {
+        if(transition && transition.index === index && !transition.collapse) {
+            lineHeight *= transition.children.length + 1;
+        }
+
+        return { 'paddingLeft': indent * level + 'px', 'height': lineHeight + 'px'};
+    };
+
+    nodeTransStyle = (transition, index) => {
+        let className = '';
+
+        if(transition && transition.index === index) {
+            if(transition.expand) { className = ' -expand'; }
+            if(transition.collapse) { className = ' -collapse'; } 
+        }
+
+        return className;
+    }
 
     render() {
         const { shader, config: { lineHeight, indent, bufferSize } } = this.props;
-        const { visible, offset } = this.state;
+        const { visible, offset, transition } = this.state;
         const node = shader || DefaultShader;
         const slice = visible.slice(offset, offset + bufferSize);
-
-        //console.error(offset, slice.length);
 
         return (
             <div className="f-tree_core" onScroll={this.onScroll}>
                 <div className="f-tree_scroll-panel" style={this.scrollStyle(lineHeight, visible.length)} />
                 <ul className="f-tree_render-panel" style={this.offsetStyle(lineHeight, offset)}>
                     { slice.map((item,index) => (
-                        <li className="f-tree_node"
-                            style={this.indentStyle(lineHeight, indent, item.$level)}
+                        index += offset,
+                        <li className={"f-tree_node" + this.nodeTransStyle(transition, index)}
+                            style={this.nodeStyle(lineHeight, indent, item.$level, index, transition)}
                             key={item.text}
-                            data-index={offset + index}
+                            data-index={index}
                             onClick={this.onClick}>
                             { node(item) }
+                            { transition && Trans(transition, index, indent, node) }
                         </li>
                     ))}
                 </ul>

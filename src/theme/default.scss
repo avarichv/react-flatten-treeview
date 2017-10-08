@@ -6,8 +6,8 @@ body {
     background-color: lightyellow;
     margin: 1em;
     border: double 3px #000;
-    height: 600px;
-    width: 35%;
+    height: 1000px;
+    width: 90%;
 }
 
 .f-tree {
@@ -33,13 +33,16 @@ body {
     }
 
     &_node {
+        overflow: hidden;
+
         &:hover {
             background-color: #d1d0ce;
         }
 
-        /* &:nth-child(even) {
-            background-color: orange;
-        } */
+        &.-expand, &.-collapse {
+            transition: height .2s ease;
+            background-color: silver;
+        }
     }
 
     &_node-shader {
@@ -67,5 +70,10 @@ body {
 
     &_label {
         padding: 0 .5em;
+    }
+
+    &_trans {
+        list-style: none;
+        padding: 0;
     }
 }
