@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 
 import DefaultShader from './tree-shader.jsx';
 import StateKeyFrame from './state-key-frame.jsx';
-import Trans from './transition-panel.jsx';
+import TransPanel from './transition-panel.jsx';
 
 export default class FlattenTreeviewCore extends Component {
     constructor(props) {
@@ -31,7 +31,19 @@ export default class FlattenTreeviewCore extends Component {
 
     /* Private methods */
 
+    normalizeNode(node) {
+        return {
+            origin: node,
+            text: node.text,
+            children: node.children,
+            childrenCount: node.childrenCount,
+            isTerminal: !node.children,
+            isExpanded: false
+        }
+    }
+
     flatten(tree, enforceExpand) {
+        tree = this.normalizeNode(tree);
         let list = [tree];
         
         tree.$level = tree.$level || 0;
@@ -69,9 +81,11 @@ export default class FlattenTreeviewCore extends Component {
     spliceChildren(nodeList, targetIndex) {
         if(nodeList.length <= targetIndex) { return nodeList; }
 
+        let flatten = this.flatten(nodeList[targetIndex]);
+
         return nodeList
                 .slice(0, targetIndex)
-                .concat(this.flatten(nodeList[targetIndex]))
+                .concat(flatten)
                 .concat(nodeList.slice(targetIndex + 1, nodeList.length));
     }
 
@@ -80,17 +94,42 @@ export default class FlattenTreeviewCore extends Component {
         let children = this.flattenChildren(node);
         let visible = this.state.visible;
 
+
         if(!node.isExpanded) {
             visible = this.clipChildren(visible, index);
-            this.keyFrames
+            this.keyFrames.reset()
                 .set(keyFrames => keyFrames.play({ visible, transition: { index, children }}))
                 .set(keyFrames => setTimeout(me => me.play({ transition: { index, children, collapse: true }}), 10, keyFrames))
                 .set(keyFrames => setTimeout(me => me.play({ transition: null }), 200, keyFrames))
                 .play();
         } else {
+            const { lazyLoader } = this.props.config;
+
             visible = this.spliceChildren(visible, index);
+
+            this.keyFrames.reset();
+            if(!node.isTerminal && node.children.length < node.childrenCount) {
+                this.keyFrames
+                    .set(keyFrames => keyFrames.play({ transition: { index, busy: true }}))
+                    .set(keyFrames => {
+                        if(typeof lazyLoader !== 'function') {
+                            throw new Error("A lazyLoader callback is required."); 
+                        }
+
+                        lazyLoader(node).then(result => {
+                            result = result.map(item => this.normalizeNode(item));
+                            children = children.concat(result);
+                            debugger;
+                            visible[index].children = children;
+
+                            visible = this.spliceChildren(visible, index);
+                            keyFrames.play();
+                        });
+                    });
+            }
+
             this.keyFrames
-                .set(keyFrames => keyFrames.play({ transition: { index, children, isBusy: false, expand: true }}))
+                .set(keyFrames => keyFrames.play({ transition: { index, children, expand: true }}))
                 .set(keyFrames => setTimeout(me => me.play({ visible, transition: null }), 200, keyFrames))
                 .play();
         }
@@ -132,8 +171,12 @@ export default class FlattenTreeviewCore extends Component {
 
     offsetStyle = (lineHeight, offset) => ({ 'top': lineHeight * offset + 'px' });
 
-    nodeStyle = (lineHeight, indent, level, index, transition) => {
-        if(transition && transition.index === index && !transition.collapse) {
+    nodeStyle = (lineHeight, indent, level, nodeIndex, transition) => {
+        const { index, busy, collapse } = transition || {};
+
+        if(busy) {
+            lineHeight *= 2;
+        } else if(index === nodeIndex && !collapse) {
             lineHeight *= transition.children.length + 1;
         }
 
@@ -169,7 +212,7 @@ export default class FlattenTreeviewCore extends Component {
                             data-index={index}
                             onClick={this.onClick}>
                             { node(item) }
-                            { transition && Trans(transition, index, indent, node) }
+                            { transition && TransPanel(transition, index, indent, node) }
                         </li>
                     ))}
                 </ul>
