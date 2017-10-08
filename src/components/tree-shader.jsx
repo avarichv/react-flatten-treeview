@@ -1,8 +1,8 @@
 const toggleIcon = (props) => {
-    const { children, isExpanded } = props;
+    const { children, isTerminal, isExpanded } = props;
     let className = ' icon';
 
-    if(!children || children.length === 0) {
+    if(isTerminal) {
         className += '';
     } else if(isExpanded) {
         className += ' icon-play3 -expanded';
@@ -14,10 +14,10 @@ const toggleIcon = (props) => {
 }
 
 const typeIcon = (props) => {
-    const { children, isExpanded } = props;
+    const { children, isTerminal, isExpanded } = props;
     let className = ' icon';
 
-    if(!children || children.length === 0) {
+    if(isTerminal) {
         className += ' icon-file-text2';
     } else if(isExpanded) {
         className += ' icon-folder-open';

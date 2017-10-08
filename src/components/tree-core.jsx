@@ -149,7 +149,7 @@ export default class FlattenTreeviewCore extends Component {
         }
 
         return className;
-    }
+    };
 
     render() {
         const { shader, config: { lineHeight, indent, bufferSize } } = this.props;

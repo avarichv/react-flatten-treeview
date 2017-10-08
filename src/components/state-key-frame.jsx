@@ -4,6 +4,11 @@ export default class StateKeyFrame {
          this.frameQueue = [];
     }
 
+    reset() {
+        this.frameQueue = [];
+        return this;
+    }
+
     set(action) {
         this.frameQueue.unshift(action);
         return this;

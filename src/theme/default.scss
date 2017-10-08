@@ -3,7 +3,7 @@ body {
 }
 
 #root {
-    background-color: lightyellow;
+    background-color: silver;
     margin: 1em;
     border: double 3px #000;
     height: 1000px;
@@ -45,13 +45,16 @@ body {
         }
     }
 
-    &_node-shader {
+    &_node-shader, 
+    &_node-busy {
         margin: 0;
         line-height: 28px;
         font-family: arial;
     }
 
-    &_toggle, &_icon {
+    &_toggle, 
+    &_icon,
+    &_spinner {
         display: inline-block;
         width: 1.2em;
         text-align: center;
@@ -68,7 +71,8 @@ body {
         }
     }
 
-    &_label {
+    &_label,
+    &_busy-msg {
         padding: 0 .5em;
     }
 

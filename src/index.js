@@ -9,7 +9,7 @@ import mockup from './demo/mock.js';
 import './theme/icons/IcoMoon-Free.css';
 import './theme/default.scss';
 
-fetch("http://demo.io").then(function(response) {
+fetch("http://demo.io/root").then(function(response) {
     return response.json();
 }).then(function(data) {
     ReactDOM.render(
