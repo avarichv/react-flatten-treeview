@@ -251,6 +251,18 @@ const BRNADS = {
     "id": "10979591-bb8c-3a1c-1ae3-1b53cf900d9e"
 }
 
+const RANDOM = {
+    "text": "Random Nodes",
+    "children": [],
+    "childrenCount": 1,
+    "id": "00000000-0000-0000-0000-000000000000"
+}
+
+const ROOT = {
+    "text": "Root", 
+    "children": [ BRNADS, RANDOM ]
+}
+
 class DemoData {
     buildNode() {
         return {
@@ -285,9 +297,10 @@ class DemoData {
     }
 
     getRoot() {
-        let root = Object.assign({}, BRNADS);
-        root.childrenCount = root.children.length;
-        root.children = [];
+        let root = { ...ROOT, children: [ ...ROOT.children ] };
+        
+        root.children[0] = { ...BRNADS, children: [], childrenCount: BRNADS.children.length };
+
         return root;
     }
     
@@ -307,18 +320,44 @@ class DemoData {
     }
 
     getChildrenById(id) {
-        let children = this.getNodeById(BRNADS, id).children || [];
+        if(id === "00000000-0000-0000-0000-000000000000") {
+            return this.getRandomChildren();
+        } 
+
+        let children = this.getNodeById(ROOT, id).children || [];
         let nodes = [];
 
         children.forEach((node, i) => {
             nodes[i] = Object.assign({}, node);
-            if(!node.isTerminal) {
-                nodes[i].childrenCount = node.children.length;
-                nodes[i].children = [];
+            if(node.isTerminal) {
+                nodes[i] = { ...node };
+            } else {
+                nodes[i] = { ...node, children: [], childrenCount: node.children.length };
             }
         });
 
         return nodes;
+    }
+
+    getRandomChildren() {
+        const rand1 = Math.round(Math.random() * 100);
+        const nodes = new Set();
+
+        for(let i = rand1; i > 0; i--) {
+            const rand2 = Math.round(Math.random() * 100);
+            const rand3 = Math.round(Math.random() * 100);
+            const randomFolder = BRNADS.children[rand1 % BRNADS.children.length];
+            const randomNode = randomFolder.children[rand2 % randomFolder.children.length];
+            nodes.add(randomNode);
+        }
+
+        return Array.from(nodes.entries(), entry => ({
+            ...entry[0], 
+            children: [], 
+            childrenCount: 1, 
+            isTerminal: (Math.random() > 0.5),
+            id: "00000000-0000-0000-0000-000000000000"
+        }));
     }
 
     newGuid() {

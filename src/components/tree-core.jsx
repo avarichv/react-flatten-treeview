@@ -37,6 +37,8 @@ export default class FlattenTreeviewCore extends Component {
         tree.$level = tree.$level || 0;
 
         if(tree.children && tree.isExpanded || enforceExpand) {
+            tree.children.sort((a,b) => a.isTerminal ? 1 : -1);
+
             tree.children.map(child => {
                 child.$level = tree.$level + 1;
                 list = list.concat(this.flatten(child));
@@ -139,7 +141,9 @@ export default class FlattenTreeviewCore extends Component {
         const nodeIndex = parseInt(evt.currentTarget.dataset['index']);
         const node = this.state.visible[nodeIndex];
 
-        this.toggleNode(node, nodeIndex);
+        if(!node.isTerminal) {
+            this.toggleNode(node, nodeIndex);       
+        }
     }
 
     onScroll(evt) {
@@ -195,7 +199,7 @@ export default class FlattenTreeviewCore extends Component {
                         index += offset,
                         <li className={"f-tree_node" + this.nodeTransStyle(transition, index)}
                             style={this.nodeStyle(lineHeight, indent, item.$level, index, transition)}
-                            key={item.text}
+                            key={index}
                             data-index={index}
                             onClick={this.onClick}>
                             { node(item) }
