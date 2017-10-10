@@ -1,8 +1,8 @@
 const lazyLoader = node => {
     return new Promise((resolve, reject) => {
-        fetch("http://demo.io/lazy-load/" + node.origin.id)
+        fetch("http://demo.io/lazy-load/" + node.id)
             .then(response => response.json())
-            .then(result => setTimeout(resolve, 2000, result));
+            .then(result => setTimeout(resolve, 1000, result));
     });
 };
 

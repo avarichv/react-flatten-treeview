@@ -31,19 +31,7 @@ export default class FlattenTreeviewCore extends Component {
 
     /* Private methods */
 
-    normalizeNode(node) {
-        return {
-            origin: node,
-            text: node.text,
-            children: node.children,
-            childrenCount: node.childrenCount,
-            isTerminal: !node.children,
-            isExpanded: false
-        }
-    }
-
     flatten(tree, enforceExpand) {
-        tree = this.normalizeNode(tree);
         let list = [tree];
         
         tree.$level = tree.$level || 0;
@@ -104,7 +92,6 @@ export default class FlattenTreeviewCore extends Component {
                 .play();
         } else {
             const { lazyLoader } = this.props.config;
-
             visible = this.spliceChildren(visible, index);
 
             this.keyFrames.reset();
@@ -117,11 +104,9 @@ export default class FlattenTreeviewCore extends Component {
                         }
 
                         lazyLoader(node).then(result => {
-                            result = result.map(item => this.normalizeNode(item));
+                            console.error('lazyLoader', result);
                             children = children.concat(result);
-                            debugger;
-                            visible[index].children = children;
-
+                            node.children = children;
                             visible = this.spliceChildren(visible, index);
                             keyFrames.play();
                         });
@@ -174,10 +159,12 @@ export default class FlattenTreeviewCore extends Component {
     nodeStyle = (lineHeight, indent, level, nodeIndex, transition) => {
         const { index, busy, collapse } = transition || {};
 
-        if(busy) {
-            lineHeight *= 2;
-        } else if(index === nodeIndex && !collapse) {
-            lineHeight *= transition.children.length + 1;
+        if(index === nodeIndex) {
+            if(busy) {
+                lineHeight *= 2;
+            } else if(!collapse) {
+                lineHeight *= transition.children.length + 1;
+            }
         }
 
         return { 'paddingLeft': indent * level + 'px', 'height': lineHeight + 'px'};
