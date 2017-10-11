@@ -31,14 +31,21 @@ export default class FlattenTreeviewCore extends Component {
 
     /* Private methods */
 
+    sortTermials(array) {
+        const parents = [];
+        const terminals = [];
+
+        array.forEach(item => item.isTerminal ? terminals.push(item) : parents.push(item));
+        return parents.concat(terminals);
+    }
+
     flatten(tree, enforceExpand) {
         let list = [tree];
         
         tree.$level = tree.$level || 0;
 
         if(tree.children && tree.isExpanded || enforceExpand) {
-            tree.children.sort((a,b) => a.isTerminal ? 1 : -1);
-
+            tree.children = this.sortTermials(tree.children);
             tree.children.map(child => {
                 child.$level = tree.$level + 1;
                 list = list.concat(this.flatten(child));
@@ -106,8 +113,7 @@ export default class FlattenTreeviewCore extends Component {
                         }
 
                         lazyLoader(node).then(result => {
-                            console.error('lazyLoader', result);
-                            children = children.concat(result);
+                            children = this.sortTermials(children.concat(result));
                             node.children = children;
                             visible = this.spliceChildren(visible, index);
                             keyFrames.play();
@@ -138,11 +144,13 @@ export default class FlattenTreeviewCore extends Component {
     /* Event handlers */
 
     onClick(evt) {
+        if(this.state.transition) { return; }
+
         const nodeIndex = parseInt(evt.currentTarget.dataset['index']);
         const node = this.state.visible[nodeIndex];
 
         if(!node.isTerminal) {
-            this.toggleNode(node, nodeIndex);       
+            this.toggleNode(node, nodeIndex);
         }
     }
 
@@ -179,7 +187,8 @@ export default class FlattenTreeviewCore extends Component {
 
         if(transition && transition.index === index) {
             if(transition.expand) { className = ' -expand'; }
-            if(transition.collapse) { className = ' -collapse'; } 
+            if(transition.collapse) { className = ' -collapse'; }
+            if(transition.busy) { className = ' -busy'; }
         }
 
         return className;
