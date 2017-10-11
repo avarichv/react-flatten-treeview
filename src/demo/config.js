@@ -11,6 +11,7 @@ const config = {
         lineHeight: 28,
         indent: 18,
         bufferSize: 50,
+        showRoot: false,
         lazyLoader: lazyLoader
     }
 }

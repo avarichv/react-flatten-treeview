@@ -259,7 +259,8 @@ const RANDOM = {
 }
 
 const ROOT = {
-    "text": "Root", 
+    "text": "Root",
+    "isExpanded": true,
     "children": [ BRNADS, RANDOM ]
 }
 

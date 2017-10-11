@@ -23,8 +23,16 @@ export default class FlattenTreeviewCore extends Component {
     /* React ife cycle methods */
 
     componentDidMount() {
+        const { config: { showRoot }} = this.props;
+        let visible = this.flatten(this.props.data);
+
+        if(!showRoot) {
+            visible.shift();
+            visible.forEach(item => item.$level--);
+        }
+
         this.setState({ 
-            visible: this.flatten(this.props.data),
+            visible,
             offset: 0
         });
     }
