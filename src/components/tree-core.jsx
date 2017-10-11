@@ -212,7 +212,7 @@ export default class FlattenTreeviewCore extends Component {
                             data-index={index}
                             onClick={this.onClick}>
                             { node(item) }
-                            { transition && TransPanel(transition, index, indent, node) }
+                            { transition && TransPanel(transition, index, lineHeight, indent, node) }
                         </li>
                     ))}
                 </ul>

@@ -6,7 +6,7 @@ body {
     background-color: silver;
     margin: 1em;
     border: double 3px #000;
-    height: 1000px;
+    height: 800px;
     width: 90%;
 }
 
@@ -24,7 +24,8 @@ body {
     }
 
     &_render-panel {
-        width: 100%;
+        width: auto;
+        min-width: 100%;
         margin: 0;
         padding: 0;
         list-style: none;
@@ -50,6 +51,7 @@ body {
         margin: 0;
         line-height: 28px;
         font-family: arial;
+        white-space: nowrap;
     }
 
     &_toggle, 
@@ -79,5 +81,9 @@ body {
     &_trans {
         list-style: none;
         padding: 0;
+    }
+
+    &_trans-node {
+        overflow: hidden;
     }
 }
