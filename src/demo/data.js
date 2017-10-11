@@ -258,10 +258,24 @@ const RANDOM = {
     "id": "00000000-0000-0000-0000-000000000000"
 }
 
+const PERFORMANCE = {
+    "text": "Performance Challenge",
+    "children": [
+        { "text": "1", "children": [], "childrenCount": 1, "id": "00ff0000-0000-0000-0000-000000000001" },
+        { "text": "10", "children": [], "childrenCount": 10, "id": "00ff0000-0000-0000-0000-000000000010" },
+        { "text": "100", "children": [], "childrenCount": 100, "id": "00ff0000-0000-0000-0000-000000000100" },
+        { "text": "1000", "children": [], "childrenCount": 1000, "id": "00ff0000-0000-0000-0000-000000001000" },
+        { "text": "10000", "children": [], "childrenCount": 10000, "id": "00ff0000-0000-0000-0000-000000010000" },
+        { "text": "100000", "children": [], "childrenCount": 100000, "id": "00ff0000-0000-0000-0000-000000100000" },
+        { "text": "1000000", "children": [], "childrenCount": 1000000, "id": "00ff0000-0000-0000-0000-000001000000" },
+    ],
+    "id": "00ff000-0000-0000-0000-000000000000"
+}
+
 const ROOT = {
     "text": "Root",
     "isExpanded": true,
-    "children": [ BRNADS, RANDOM ]
+    "children": [ BRNADS, RANDOM, PERFORMANCE ]
 }
 
 class DemoData {
@@ -320,10 +334,49 @@ class DemoData {
         return result;
     }
 
+    getPerformanceData(id) {
+        let count = 0;
+        let nodes = [];
+
+        switch(36 - id.lastIndexOf('1') + '') {
+            case '1': 
+                count = 1;
+                break; 
+            case '2':
+                count = 10;
+                break;
+            case '3':
+                count = 100;
+                break;
+            case '4':
+                count = 1000;
+                break;
+            case '5':
+                count = 10000;
+                break;
+            case '6':
+                count = 100000;
+                break;
+            case '7':
+                count = 1000000;
+                break;
+        }
+
+        for(let i = 0; i < count; i++) {
+            nodes.push({ text: "item-" + i, isTerminal: true });
+        }
+
+        return nodes;
+    }
+
     getChildrenById(id) {
         if(id === "00000000-0000-0000-0000-000000000000") {
             return this.getRandomChildren();
-        } 
+        }
+
+        if(id.indexOf("00ff") === 0) {
+            return this.getPerformanceData(id);
+        }
 
         let children = this.getNodeById(ROOT, id).children || [];
         let nodes = [];
