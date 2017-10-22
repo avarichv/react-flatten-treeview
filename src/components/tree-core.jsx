@@ -153,6 +153,19 @@ export default class FlattenTreeviewCore extends Component {
         this.setState({ visible: this.state.visible });
     }
 
+    activateNode(node, index) {
+        this.selection.forEach(p => p.isSelected = false);
+        this.selection.clear();
+        this.selection.add(node);
+
+        node.isSelected = true;
+
+        if(typeof this.props.onSelect === 'function') {
+            this.props.onSelect(Array.from(this.selection.values()));
+        }
+        this.setState({ visible: this.state.visible });
+    }
+
     offsetByTop(scrollTop) {
         const { config: { lineHeight }} = this.props;
         const offset = Math.floor(scrollTop / lineHeight);
@@ -174,10 +187,11 @@ export default class FlattenTreeviewCore extends Component {
         const nodeIndex = parseInt(evt.currentTarget.dataset['index']);
         const node = this.state.visible[nodeIndex];
         const className = evt.target.className.split(' ')[0];
+        const { config: { selectMode } } = this.props;
 
         switch(className) {
             case 'f-tree_label':
-                this.selectNode(node, nodeIndex);
+                selectMode === 'navigate' ? this.activateNode(node, nodeIndex) : this.selectNode(node, nodeIndex);
                 break;
             case 'f-tree_toggle':
             case 'f-tree_icon':

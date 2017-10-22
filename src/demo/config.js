@@ -12,6 +12,7 @@ const config = {
         indent: 18,
         bufferSize: 50,
         showRoot: false,
+        selectMode: 'navigate', // navigate / select
         lazyLoader: lazyLoader
     }
 }
