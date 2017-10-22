@@ -9,12 +9,9 @@ export default class FlattenTreeview extends Component {
     }
 
     render() {
-        const { data, config } = this.props;
-
         return (
             <div className="f-tree">
-                <Core data={data} 
-                  config={config} />
+                <Core {...this.props} />
             </div>
         );
     }

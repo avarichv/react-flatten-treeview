@@ -12,9 +12,11 @@ export default class FlattenTreeviewCore extends Component {
         this.cooldownTimer = null;
         this.state = { visible: [], offset: 0 };
         this.keyFrames = new StateKeyFrame(this);
+        this.selection = new Set();
 
         this.offsetByTop = this.offsetByTop.bind(this);
         this.toggleNode = this.toggleNode.bind(this);
+        this.selectNode = this.selectNode.bind(this);
 
         this.onClick = this.onClick.bind(this);
         this.onScroll = this.onScroll.bind(this);
@@ -136,6 +138,21 @@ export default class FlattenTreeviewCore extends Component {
         }
     }
 
+    selectNode(node, index) {
+        if(node.isSelected) {
+            this.selection.delete(node);
+        } else {
+            this.selection.add(node);
+        }
+        node.isSelected = !node.isSelected;
+
+        if(typeof this.props.onSelect === 'function') {
+            this.props.onSelect(Array.from(this.selection.values()));
+        }
+
+        this.setState({ visible: this.state.visible });
+    }
+
     offsetByTop(scrollTop) {
         const { config: { lineHeight }} = this.props;
         const offset = Math.floor(scrollTop / lineHeight);
@@ -156,9 +173,20 @@ export default class FlattenTreeviewCore extends Component {
 
         const nodeIndex = parseInt(evt.currentTarget.dataset['index']);
         const node = this.state.visible[nodeIndex];
+        const className = evt.target.className.split(' ')[0];
 
-        if(!node.isTerminal) {
-            this.toggleNode(node, nodeIndex);
+        switch(className) {
+            case 'f-tree_label':
+                this.selectNode(node, nodeIndex);
+                break;
+            case 'f-tree_toggle':
+            case 'f-tree_icon':
+                if(!node.isTerminal) {
+                    this.toggleNode(node, nodeIndex);
+                }
+                break;
+            default:
+                break;
         }
     }
 
@@ -202,6 +230,8 @@ export default class FlattenTreeviewCore extends Component {
         return className;
     };
 
+    nodeSelectStyle = item => item.isSelected ? ' -selected' : '';
+
     render() {
         const { shader, config: { lineHeight, indent, bufferSize } } = this.props;
         const { visible, offset, transition } = this.state;
@@ -214,9 +244,9 @@ export default class FlattenTreeviewCore extends Component {
                 <ul className="f-tree_render-panel" style={this.offsetStyle(lineHeight, offset)}>
                     { slice.map((item,index) => (
                         index += offset,
-                        <li className={"f-tree_node" + this.nodeTransStyle(transition, index)}
+                        <li className={"f-tree_node" + this.nodeTransStyle(transition, index) + this.nodeSelectStyle(item)}
                             style={this.nodeStyle(lineHeight, indent, item.$level, index, transition)}
-                            key={index}
+                            key={index + item.text}
                             data-index={index}
                             onClick={this.onClick}>
                             { node(item) }

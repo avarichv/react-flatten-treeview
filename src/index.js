@@ -5,6 +5,7 @@ import ReactDOM from 'react-dom';
 import Tree from './components/tree-view.jsx';
 import config from './demo/config.js';
 import mockup from './demo/mock.js';
+import { onSelect, onChange, onAction } from './demo/handler.js';
 
 import './theme/icons/IcoMoon-Free.css';
 import './theme/default.scss';
@@ -14,7 +15,8 @@ fetch("http://demo.io/root").then(function(response) {
 }).then(function(data) {
     ReactDOM.render(
         <Tree data={data}
-              config={config.base} />,
+              config={config.base}
+              onSelect={onSelect} />,
         document.getElementById('root')
     );
 });
